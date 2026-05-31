@@ -121,7 +121,14 @@ class DataStream():
             else:
                 print(f"DataStream error - Can't process element in stream: {element}")
     def print_processors_stats(self) -> None:
-        pass
+        print("== DataStream statistics ==")
+        if not self.processor:
+            print("No processor found, no data")
+        for element in self.processor:
+            name = element.__class__.__name__
+            number = element.counter
+            remainder = len(element.values)
+            print(f"{name}: total {number} items processed, remaining {remainder} on processor")
 
 
 def main():
