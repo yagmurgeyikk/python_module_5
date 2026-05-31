@@ -106,24 +106,23 @@ class DataStream():
     def __init__(self):
         self.processor = []
     def register_processor(self, proc: DataProcessor) -> None:
-        self.processor.append()
+        self.processor.append(proc)
     def process_stream(self, stream: list[typing.Any]) -> None:
         for element in stream:
-            if NumericProcessor.validate(element) == True:
-                NumericProcessor.ingest(element)
-                break
-            elif TextProcessor.validate(element) == True:
-                TextProcessor.ingest(element)
-                break
-            elif LogProcessor.validate(element) == True:
-                LogProcessor.ingest(element)
-                break
-            else:
+            flag = False
+            for process in self.processor:
+
+                if process.validate(element) == True:
+                    process.ingest(element)
+                    flag = True
+                    break
+            if flag == False:
                 print(f"DataStream error - Can't process element in stream: {element}")
     def print_processors_stats(self) -> None:
         print("== DataStream statistics ==")
         if not self.processor:
             print("No processor found, no data")
+            return
         for element in self.processor:
             name = element.__class__.__name__
             number = element.counter
@@ -132,54 +131,8 @@ class DataStream():
 
 
 def main():
-    print("=== Code Nexus - Data Processor ===")
+    print("=== Code Nexus - Data Stream ===")
     print()
-    print("Testing Numeric Processor...")
-    num_proc = NumericProcessor()
-    test = [42, "Hello"]
-    for element in test:
-        result = num_proc.validate(element)
-        print(f"Trying to validate input '{element}': {result}")
-    try:
-        print(f"Test invalid ingestion of string 'foo' without prior validation:")
-        num_proc.ingest("foo")
-    except ValueError as e:
-        print(f"Got exception: {e}")
-    test3 = [1, 2, 3, 4, 5]
-    num_proc.ingest(test3)
-    print(f"Processing data: {test3}")
-    print("Extracting 3 values...")
-    i = 0
-    while i < 3:
-        result =num_proc.output()[1]
-        print(f"Numeric value {i}: {result}")
-        i += 1
-    print()
-    print("Testing Text Processor...")
-    text_proc = TextProcessor()
-    result = text_proc.validate(42)
-    print(f"Trying to validate input '42': {result}")
-    string_list = ["Hello", "Nexus", "World"]
-    text_proc.ingest(string_list)
-    print(f"Processing data: {string_list}")
-    print("Extracting 1 value...")
-    result = text_proc.output()[1]
-    print(f"Text value 0: {result}")
-    print()
-    print("Testing Log Processor...")
-    log_proc = LogProcessor()
-    result = log_proc.validate("Hello")
-    print(f"Trying to validate input 'Hello': {result}")
-    log_test =  [{'log_level': 'NOTICE', 'log_message': 'Connection to server'},
-                {'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]
-    log_proc.ingest(log_test)
-    print(f"Processing data: {log_test}")
-    j = 0
-    while j < 2:
-        result = log_proc.output()[1]
-        print(f"Log entry {j}: {result}")
-        j += 1
-
-
-if __name__ == "__main__":
-    main()
+    print("Initialize Data Stream...")
+    
+    
