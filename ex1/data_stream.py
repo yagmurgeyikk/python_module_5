@@ -141,8 +141,27 @@ def main():
     numeric = NumericProcessor()
     stream.register_processor(numeric)
     test = ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},{'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]
-    print()
     print(f"Send first batch of data on stream: {test}")
     stream.process_stream(test)
     stream.print_processors_stats()
+
+    print("Registering other data processors")
+    txt = TextProcessor()
+    log = LogProcessor()
+    stream.register_processor(txt)
+    stream.register_processor(log)
+    print("Send the same batch again")
+    stream.process_stream(txt)
+
+    stream.print_processors_stats()
+    print("Consume some elements from the data processors: Numeric 3, Text 2, Log 1")
+    numeric.output()
+    numeric.output()
+    numeric.output()
+    txt.output()
+    txt.output()
+    log.output()
+
+    stream.print_processors_stats()
+
     
