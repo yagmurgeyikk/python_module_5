@@ -134,5 +134,15 @@ def main():
     print("=== Code Nexus - Data Stream ===")
     print()
     print("Initialize Data Stream...")
-    
+    stream = DataStream()
+    stream.print_processors_stats()
+    print()
+    print("Registering Numeric Processor")
+    numeric = NumericProcessor()
+    stream.register_processor(numeric)
+    test = ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},{'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]
+    print()
+    print(f"Send first batch of data on stream: {test}")
+    stream.process_stream(test)
+    stream.print_processors_stats()
     
