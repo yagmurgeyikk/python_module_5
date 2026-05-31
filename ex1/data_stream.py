@@ -103,10 +103,23 @@ class LogProcessor(DataProcessor):
 
 
 class DataStream():
+    def __init__(self):
+        self.processor = []
     def register_processor(self, proc: DataProcessor) -> None:
-        pass
+        self.processor.append()
     def process_stream(self, stream: list[typing.Any]) -> None:
-        pass
+        for element in stream:
+            if NumericProcessor.validate(element) == True:
+                NumericProcessor.ingest(element)
+                break
+            elif TextProcessor.validate(element) == True:
+                TextProcessor.ingest(element)
+                break
+            elif LogProcessor.validate(element) == True:
+                LogProcessor.ingest(element)
+                break
+            else:
+                print(f"DataStream error - Can't process element in stream: {element}")
     def print_processors_stats(self) -> None:
         pass
 
