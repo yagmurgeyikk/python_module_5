@@ -102,6 +102,15 @@ class LogProcessor(DataProcessor):
             self.counter += 1
 
 
+class DataStream():
+    def register_processor(self, proc: DataProcessor) -> None:
+        pass
+    def process_stream(self, stream: list[typing.Any]) -> None:
+        pass
+    def print_processors_stats(self) -> None:
+        pass
+
+
 def main():
     print("=== Code Nexus - Data Processor ===")
     print()
