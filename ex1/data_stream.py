@@ -111,7 +111,6 @@ class DataStream():
         for element in stream:
             flag = False
             for process in self.processor:
-
                 if process.validate(element) == True:
                     process.ingest(element)
                     flag = True
@@ -125,6 +124,12 @@ class DataStream():
             return
         for element in self.processor:
             name = element.__class__.__name__
+            if name == "NumericProcessor":
+                name = "Numeric Processor"
+            elif name == "TextProcessor":
+                name = "Text Processor"
+            elif name == "LogProcessor":
+                name = "Log Processor"
             number = element.counter
             remainder = len(element.values)
             print(f"{name}: total {number} items processed, remaining {remainder} on processor")
@@ -138,22 +143,24 @@ def main():
     stream.print_processors_stats()
     print()
     print("Registering Numeric Processor")
+    print()
     numeric = NumericProcessor()
     stream.register_processor(numeric)
-    test = ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},{'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]
+    test =  ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'}, {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]
     print(f"Send first batch of data on stream: {test}")
     stream.process_stream(test)
     stream.print_processors_stats()
-
+    print()
     print("Registering other data processors")
     txt = TextProcessor()
     log = LogProcessor()
     stream.register_processor(txt)
     stream.register_processor(log)
     print("Send the same batch again")
-    stream.process_stream(txt)
+    stream.process_stream(test)
 
     stream.print_processors_stats()
+    print()
     print("Consume some elements from the data processors: Numeric 3, Text 2, Log 1")
     numeric.output()
     numeric.output()
@@ -164,4 +171,6 @@ def main():
 
     stream.print_processors_stats()
 
+if __name__ == "__main__":
+    main()
     
