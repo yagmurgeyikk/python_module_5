@@ -101,6 +101,9 @@ class LogProcessor(DataProcessor):
             self.values.append((self.counter, log))
             self.counter += 1
 
+class ExportPlugin(typing.Protocol):
+    def process_output(self, data: list[tuple[int, str]]) -> None:
+        pass
 
 class DataStream():
     def __init__(self):
@@ -133,44 +136,23 @@ class DataStream():
             number = element.counter
             remainder = len(element.values)
             print(f"{name}: total {number} items processed, remaining {remainder} on processor")
+        
 
+    def output_pipeline(self, nb: int, plugin: ExportPlugin) -> None:
+
+        for element in self.processor:
+            data_output = []
+            i = 0
+            length = len(element.values)
+            while i < nb and length > 0:
+                processor_value = data_output()
+                data_output.append(processor_value)
+                i += 1
+            if data_output != []:
+                plugin.process_output(data_output)
 
 def main():
-    print("=== Code Nexus - Data Stream ===")
-    print()
-    print("Initialize Data Stream...")
-    stream = DataStream()
-    stream.print_processors_stats()
-    print()
-    print("Registering Numeric Processor")
-    print()
-    numeric = NumericProcessor()
-    stream.register_processor(numeric)
-    test =  ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'}, {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]
-    print(f"Send first batch of data on stream: {test}")
-    stream.process_stream(test)
-    stream.print_processors_stats()
-    print()
-    print("Registering other data processors")
-    txt = TextProcessor()
-    log = LogProcessor()
-    stream.register_processor(txt)
-    stream.register_processor(log)
-    print("Send the same batch again")
-    stream.process_stream(test)
-
-    stream.print_processors_stats()
-    print()
-    print("Consume some elements from the data processors: Numeric 3, Text 2, Log 1")
-    numeric.output()
-    numeric.output()
-    numeric.output()
-    txt.output()
-    txt.output()
-    log.output()
-
-    stream.print_processors_stats()
+    pass
 
 if __name__ == "__main__":
     main()
-    
