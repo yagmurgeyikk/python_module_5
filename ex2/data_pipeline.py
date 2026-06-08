@@ -105,6 +105,21 @@ class ExportPlugin(typing.Protocol):
     def process_output(self, data: list[tuple[int, str]]) -> None:
         pass
 
+class CSV:
+        def process_output(self, data: list[tuple[int, str]]) -> None:
+            if not data:
+                return
+            print("CSV Output:")
+            length = len(data) 
+            i = 0
+            text = ""
+            for element in data:
+                i += 1
+                text += element[1]
+                if i != length:
+                    text += ","
+            print(text)
+            
 class DataStream():
     def __init__(self):
         self.processor = []
