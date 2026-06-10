@@ -178,17 +178,33 @@ class DataStream():
             i = 0
             length = len(element.values)
             while i < nb and length > 0:
-                processor_value = data_output()
+                processor_value = element.output()
                 data_output.append(processor_value)
                 i += 1
             if data_output != []:
                 plugin.process_output(data_output)
 
 def main():
-    obje = JSON()
-    data = [(0, "hello"),(1, "yagmur"), (2, "yalova")]
-
-    obje.process_output(data)
+    print("=== Code Nexus - Data Pipeline ===")
+    print()
+    print("Initialize Data Stream...")
+    print()
+    example = DataStream()
+    example.print_processors_stats()
+    print()
+    print("Registering Processors")
+    print()
+    example.register_processor(NumericProcessor())
+    example.register_processor(TextProcessor())
+    example.register_processor(LogProcessor())
+    text = []
+    example.process_stream(text)
+    text = ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'}, {'log_level': 'INFO', 'log_message': 'User wil is connected'}], 42, ['Hi', 'five']]
+    print(f"Send first batch of data on stream: {text}")
+    print()
+    example.process_stream(text)
+    print()
+    example.process_stream(text)
 
 if __name__ == "__main__":
     main()
