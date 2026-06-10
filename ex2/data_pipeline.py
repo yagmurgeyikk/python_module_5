@@ -106,19 +106,37 @@ class ExportPlugin(typing.Protocol):
         pass
 
 class CSV:
-        def process_output(self, data: list[tuple[int, str]]) -> None:
-            if not data:
-                return
-            print("CSV Output:")
-            length = len(data) 
-            i = 0
-            text = ""
-            for element in data:
-                i += 1
-                text += element[1]
-                if i != length:
-                    text += ","
-            print(text)
+    def process_output(self, data: list[tuple[int, str]]) -> None:
+        if not data:
+            return
+        print("CSV Output:")
+        length = len(data) 
+        i = 0
+        text = ""
+        for element in data:
+            i += 1
+            text += element[1]
+            if i != length:
+                text += ","
+        print(text)
+
+class JSON:
+    def process_output(self, data: list[tuple[int, str]]) -> None:
+        if not data:
+            return
+        print("JSON Output:")
+        length = len(data) 
+        i = 0
+        text = ""
+        for element in data:
+            i += 1
+            text += (f'"item_{element[0]}": "{element[1]}"')
+            if i != length:
+                text += " ,"
+        print("{", end= "")
+        print(f"{text}", end="")
+        print("}")
+
             
 class DataStream():
     def __init__(self):
@@ -167,7 +185,10 @@ class DataStream():
                 plugin.process_output(data_output)
 
 def main():
-    pass
+    obje = JSON()
+    data = [(0, "hello"),(1, "yagmur"), (2, "yalova")]
+
+    obje.process_output(data)
 
 if __name__ == "__main__":
     main()
