@@ -132,7 +132,7 @@ class JSON:
             i += 1
             text += (f'"item_{element[0]}": "{element[1]}"')
             if i != length:
-                text += " ,"
+                text += ", "
         print("{", end= "")
         print(f"{text}", end="")
         print("}")
@@ -181,6 +181,7 @@ class DataStream():
                 processor_value = element.output()
                 data_output.append(processor_value)
                 i += 1
+                length -= 1
             if data_output != []:
                 plugin.process_output(data_output)
 
@@ -197,14 +198,30 @@ def main():
     example.register_processor(NumericProcessor())
     example.register_processor(TextProcessor())
     example.register_processor(LogProcessor())
-    text = []
-    example.process_stream(text)
-    text = ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'}, {'log_level': 'INFO', 'log_message': 'User wil is connected'}], 42, ['Hi', 'five']]
-    print(f"Send first batch of data on stream: {text}")
+    text1 = ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'}, {'log_level': 'INFO', 'log_message': 'User wil is connected'}], 42, ['Hi', 'five']]
+    print(f"Send first batch of data on stream: {text1}")
     print()
-    example.process_stream(text)
+    example.process_stream(text1)
+    example.print_processors_stats()
     print()
-    example.process_stream(text)
+    print("Send 3 processed data from each processor to a CSV plugin:")
+    csv = CSV()
+    example.output_pipeline(3, csv)
+    print()
+    example.print_processors_stats()
+    print()
+    text2 =  [21, ['I love AI', 'LLMs are wonderful', 'Stay healthy'], [{'log_level': 'ERROR', 'log_message': '500 server crash'}, {'log_level': 'NOTICE', 'log_message': 'Certificate expires in 10 days'}], [32, 42, 64, 84, 128, 168], 'World hello']
+    print(f"Send another batch of data: {text2}")
+    print()
+    example.process_stream(text2)
+    example.print_processors_stats()
+    print()
+    print("Send 5 processed data from each processor to a JSON plugin:")
+    json = JSON()
+    example.output_pipeline(5, json)
+    print()
+    example.print_processors_stats()
+
 
 if __name__ == "__main__":
     main()
