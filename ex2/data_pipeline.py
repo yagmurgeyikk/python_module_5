@@ -220,12 +220,18 @@ def main() -> None:
               'connected'}], 42, ['Hi', 'five']]
     print(f"Send first batch of data on stream: {text1}")
     print()
-    example.process_stream(text1)
+    try:
+        example.process_stream(text1)
+    except ValueError:
+        print("False")
     example.print_processors_stats()
     print()
     print("Send 3 processed data from each processor to a CSV plugin:")
     csv = CSV()
-    example.output_pipeline(3, csv)
+    try:
+        example.output_pipeline(3, csv)
+    except Exception:
+        print("False")
     print()
     example.print_processors_stats()
     print()
@@ -235,12 +241,18 @@ def main() -> None:
               '10 days'}], [32, 42, 64, 84, 128, 168], 'World hello']
     print(f"Send another batch of data: {text2}")
     print()
-    example.process_stream(text2)
+    try:
+        example.process_stream(text2)
+    except Exception:
+        print("False")
     example.print_processors_stats()
     print()
     print("Send 5 processed data from each processor to a JSON plugin:")
     json = JSON()
-    example.output_pipeline(5, json)
+    try:
+        example.output_pipeline(5, json)
+    except Exception:
+        print("False")
     print()
     example.print_processors_stats()
 

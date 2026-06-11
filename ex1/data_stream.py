@@ -76,7 +76,11 @@ class LogProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
         if type(data) is dict:
             for key, value in data.items():
-                if type(key) is (str) and type(value) is (str):
+                if (
+                    isinstance(key, str)
+                    and isinstance(value, str)
+                    and key.strip() and value.strip()
+                ):
                     pass
                 else:
                     return False
@@ -86,7 +90,12 @@ class LogProcessor(DataProcessor):
             for element in data:
                 if type(element) is dict:
                     for key, value in element.items():
-                        if type(key) is (str) and type(value) is (str):
+                        if (
+                            isinstance(key, str)
+                            and isinstance(value, str)
+                            and key.strip()
+                            and value.strip()
+                        ):
                             pass
                         else:
                             return False
@@ -165,7 +174,10 @@ def main() -> None:
             {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42,
             ['Hi', 'five']]
     print(f"Send first batch of data on stream: {test}")
-    stream.process_stream(test)
+    try:
+        stream.process_stream(test)
+    except ValueError:
+        print("False")
     stream.print_processors_stats()
     print()
     print("Registering other data processors")
@@ -174,19 +186,23 @@ def main() -> None:
     stream.register_processor(txt)
     stream.register_processor(log)
     print("Send the same batch again")
-    stream.process_stream(test)
-
+    try:
+        stream.process_stream(test)
+    except ValueError:
+        print("False")
     stream.print_processors_stats()
     print()
     print("Consume some elements from the data processors: "
           "Numeric 3, Text 2, Log 1")
-    numeric.output()
-    numeric.output()
-    numeric.output()
-    txt.output()
-    txt.output()
-    log.output()
-
+    try:
+        numeric.output()
+        numeric.output()
+        numeric.output()
+        txt.output()
+        txt.output()
+        log.output()
+    except Exception:
+        print("False")
     stream.print_processors_stats()
 
 
