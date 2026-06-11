@@ -76,7 +76,11 @@ class LogProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
         if type(data) is dict:
             for key, value in data.items():
-                if type(key) is (str) and type(value) is (str):
+                if (
+                    isinstance(key, str)
+                    and isinstance(value, str)
+                    and key.strip() and value.strip()
+                ):
                     pass
                 else:
                     return False
@@ -86,7 +90,11 @@ class LogProcessor(DataProcessor):
             for element in data:
                 if type(element) is dict:
                     for key, value in element.items():
-                        if type(key) is (str) and type(value) is (str):
+                        if (
+                            isinstance(key, str)
+                            and isinstance(value, str)
+                            and key.strip() and value.strip()
+                        ):
                             pass
                         else:
                             return False
@@ -220,39 +228,27 @@ def main() -> None:
               'connected'}], 42, ['Hi', 'five']]
     print(f"Send first batch of data on stream: {text1}")
     print()
-    try:
-        example.process_stream(text1)
-    except ValueError:
-        print("False")
+    example.process_stream(text1)
     example.print_processors_stats()
     print()
     print("Send 3 processed data from each processor to a CSV plugin:")
     csv = CSV()
-    try:
-        example.output_pipeline(3, csv)
-    except Exception:
-        print("False")
+    example.output_pipeline(3, csv)
     print()
     example.print_processors_stats()
     print()
     text2 = [21, ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
              [{'log_level': 'ERROR', 'log_message': '500 server crash'},
-             {'log_level': 'NOTICE', 'log_message': 'Certificate expires in '
+             {'log_level': 'NOTICE', 'log_message': 'Certificate expires in'
               '10 days'}], [32, 42, 64, 84, 128, 168], 'World hello']
     print(f"Send another batch of data: {text2}")
     print()
-    try:
-        example.process_stream(text2)
-    except Exception:
-        print("False")
+    example.process_stream(text2)
     example.print_processors_stats()
     print()
     print("Send 5 processed data from each processor to a JSON plugin:")
     json = JSON()
-    try:
-        example.output_pipeline(5, json)
-    except Exception:
-        print("False")
+    example.output_pipeline(5, json)
     print()
     example.print_processors_stats()
 
