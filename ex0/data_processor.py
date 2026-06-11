@@ -147,7 +147,7 @@ def main() -> None:
             print(f"Numeric value {i}: {result_output}")
             i += 1
     except Exception:
-        print("False - NumericProcessor")
+        print("False(Numeric)")
     print()
     print("Testing Text Processor...")
     text_proc = TextProcessor()
@@ -162,7 +162,7 @@ def main() -> None:
             result_output = text_proc.output()[1]
             print(f"Text value 0: {result_output}")
     except Exception:
-        print("False - TextProcessor")
+        print("False (Text)")
     print()
     print("Testing Log Processor...")
     log_proc = LogProcessor()
@@ -174,13 +174,14 @@ def main() -> None:
         log_proc.ingest(log_test)
         print(f"Processing data: {log_test}")
         j = 0
+        print("Extracting 2 values...")
         if result:
             while j < 2:
                 result_output = log_proc.output()[1]
                 print(f"Log entry {j}: {result_output}")
                 j += 1
     except Exception:
-        print("False - LogProcessor")
+        print("False(Log)")
 
 
 if __name__ == "__main__":
