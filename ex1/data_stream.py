@@ -169,15 +169,12 @@ def main() -> None:
     numeric = NumericProcessor()
     stream.register_processor(numeric)
     test = ['Hello world', [3.14, -1, 2.71],
-            [{'log_level': 'WARNING', 'log_message':
-              'Telnet access! Use ssh instead'},
-            {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42,
-            ['Hi', 'five']]
+            [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh '
+             'instead'}, {'log_level': 'INFO', 'log_message': 'User wil is '
+             'connected'}], 42, ['Hi', 'five']]
+
     print(f"Send first batch of data on stream: {test}")
-    try:
-        stream.process_stream(test)
-    except ValueError:
-        print("False")
+    stream.process_stream(test)
     stream.print_processors_stats()
     print()
     print("Registering other data processors")
@@ -186,10 +183,7 @@ def main() -> None:
     stream.register_processor(txt)
     stream.register_processor(log)
     print("Send the same batch again")
-    try:
-        stream.process_stream(test)
-    except ValueError:
-        print("False")
+    stream.process_stream(test)
     stream.print_processors_stats()
     print()
     print("Consume some elements from the data processors: "
@@ -202,7 +196,9 @@ def main() -> None:
         txt.output()
         log.output()
     except Exception:
-        print("False")
+        print()
+        print("False - Test directory is incorrect")
+        print()
     stream.print_processors_stats()
 
 
