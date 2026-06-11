@@ -1,37 +1,42 @@
 import typing
 import abc
 
+
 class DataProcessor(abc.ABC):
     def __init__(self):
         self.counter = 0
         self.values = []
+
     @abc.abstractmethod
     def validate(self, data: typing.Any) -> bool:
         pass
+
     @abc.abstractmethod
     def ingest(self, data: typing.Any) -> None:
         pass
+
     def output(self) -> tuple[int, str]:
         return self.values.pop(0)
 
+
 class NumericProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
-        if type(data) in (int,float):
+        if type(data) in (int, float):
             return True
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
-                if type(element) in (int,float):
+                if type(element) in (int, float):
                     pass
                 else:
                     return False
-            return True    
+            return True
         else:
             return False
 
     def ingest(self, data: typing.Any) -> None:
         if not self.validate(data):
             raise ValueError("Improper numeric data")
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
                 self.values.append((self.counter, str(element)))
                 self.counter += 1
@@ -39,25 +44,26 @@ class NumericProcessor(DataProcessor):
             self.values.append((self.counter, str(data)))
             self.counter += 1
 
+
 class TextProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
-        if type(data) == (str):
+        if type(data) is (str):
             return True
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
-                if type(element) == (str):
+                if element and type(element) is (str):
                     pass
                 else:
                     return False
             return True
-                
+
         else:
             return False
-        
+
     def ingest(self, data: typing.Any) -> None:
         if not self.validate(data):
             raise ValueError("Improper text data")
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
                 self.values.append((self.counter, element))
                 self.counter += 1
@@ -65,33 +71,35 @@ class TextProcessor(DataProcessor):
             self.values.append((self.counter, data))
             self.counter += 1
 
+
 class LogProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
-        if type(data) == dict:
+        if type(data) is dict:
             for key, value in data.items():
-                if type(key) == (str) and type (value) == (str):
+                if type(key) is (str) and type(value) is (str):
                     pass
                 else:
                     return False
             return True
-        
-        if type(data) == list:
+
+        if type(data) is list:
             for element in data:
-                if type(element) == dict:
+                if type(element) is dict:
                     for key, value in element.items():
-                        if type(key) == (str) and type (value) == (str):
+                        if type(key) is (str) and type(value) is (str):
                             pass
                         else:
                             return False
                 else:
                     return False
-            return True      
+            return True
         else:
             return False
+
     def ingest(self, data: typing.Any) -> None:
         if not self.validate(data):
             raise ValueError("Improper log data")
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
                 log = f"{element['log_level']}: {element['log_message']}"
                 self.values.append((self.counter, log))
@@ -112,7 +120,10 @@ def main():
         result = num_proc.validate(element)
         print(f"Trying to validate input '{element}': {result}")
     try:
-        print(f"Test invalid ingestion of string 'foo' without prior validation:")
+        print(
+            "Test invalid ingestion of string "
+            "'foo' without prior validation:"
+        )
         num_proc.ingest("foo")
     except ValueError as e:
         print(f"Got exception: {e}")
@@ -122,7 +133,7 @@ def main():
     print("Extracting 3 values...")
     i = 0
     while i < 3:
-        result =num_proc.output()[1]
+        result = num_proc.output()[1]
         print(f"Numeric value {i}: {result}")
         i += 1
     print()
@@ -139,9 +150,9 @@ def main():
     print()
     print("Testing Log Processor...")
     log_proc = LogProcessor()
-    result = log_proc.validate("Hello")
+    result = log_proc.validate({"nur": "hello"})
     print(f"Trying to validate input 'Hello': {result}")
-    log_test =  [{'log_level': 'NOTICE', 'log_message': 'Connection to server'},
+    log_test = [{'log_level': '', 'log_message': 'Connection to server'},
                 {'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]
     log_proc.ingest(log_test)
     print(f"Processing data: {log_test}")

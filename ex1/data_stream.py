@@ -1,37 +1,42 @@
 import typing
 import abc
 
+
 class DataProcessor(abc.ABC):
     def __init__(self):
         self.counter = 0
         self.values = []
+
     @abc.abstractmethod
     def validate(self, data: typing.Any) -> bool:
         pass
+
     @abc.abstractmethod
     def ingest(self, data: typing.Any) -> None:
         pass
+
     def output(self) -> tuple[int, str]:
         return self.values.pop(0)
 
+
 class NumericProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
-        if type(data) in (int,float):
+        if type(data) in (int, float):
             return True
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
-                if type(element) in (int,float):
+                if type(element) in (int, float):
                     pass
                 else:
                     return False
-            return True    
+            return True
         else:
             return False
 
     def ingest(self, data: typing.Any) -> None:
         if not self.validate(data):
             raise ValueError("Improper numeric data")
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
                 self.values.append((self.counter, str(element)))
                 self.counter += 1
@@ -39,25 +44,26 @@ class NumericProcessor(DataProcessor):
             self.values.append((self.counter, str(data)))
             self.counter += 1
 
+
 class TextProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
-        if type(data) == (str):
+        if type(data) is (str):
             return True
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
-                if type(element) == (str):
+                if type(element) is (str):
                     pass
                 else:
                     return False
             return True
-                
+
         else:
             return False
-        
+
     def ingest(self, data: typing.Any) -> None:
         if not self.validate(data):
             raise ValueError("Improper text data")
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
                 self.values.append((self.counter, element))
                 self.counter += 1
@@ -65,33 +71,35 @@ class TextProcessor(DataProcessor):
             self.values.append((self.counter, data))
             self.counter += 1
 
+
 class LogProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
-        if type(data) == dict:
+        if type(data) is dict:
             for key, value in data.items():
-                if type(key) == (str) and type (value) == (str):
+                if type(key) is (str) and type(value) is (str):
                     pass
                 else:
                     return False
             return True
-        
-        if type(data) == list:
+
+        if type(data) is list:
             for element in data:
-                if type(element) == dict:
+                if type(element) is dict:
                     for key, value in element.items():
-                        if type(key) == (str) and type (value) == (str):
+                        if type(key) is (str) and type(value) is (str):
                             pass
                         else:
                             return False
                 else:
                     return False
-            return True      
+            return True
         else:
             return False
+
     def ingest(self, data: typing.Any) -> None:
         if not self.validate(data):
             raise ValueError("Improper log data")
-        if type(data) == list:
+        if type(data) is list:
             for element in data:
                 log = f"{element['log_level']}: {element['log_message']}"
                 self.values.append((self.counter, log))
@@ -105,18 +113,22 @@ class LogProcessor(DataProcessor):
 class DataStream():
     def __init__(self):
         self.processor = []
+
     def register_processor(self, proc: DataProcessor) -> None:
         self.processor.append(proc)
+
     def process_stream(self, stream: list[typing.Any]) -> None:
         for element in stream:
             flag = False
             for process in self.processor:
-                if process.validate(element) == True:
+                if process.validate(element) is True:
                     process.ingest(element)
                     flag = True
                     break
-            if flag == False:
-                print(f"DataStream error - Can't process element in stream: {element}")
+            if flag is False:
+                print(f"DataStream error - Can't process "
+                      f"element in stream: {element}")
+
     def print_processors_stats(self) -> None:
         print("== DataStream statistics ==")
         if not self.processor:
@@ -132,7 +144,8 @@ class DataStream():
                 name = "Log Processor"
             number = element.counter
             remainder = len(element.values)
-            print(f"{name}: total {number} items processed, remaining {remainder} on processor")
+            print(f"{name}: total {number} items processed, remaining "
+                  f"{remainder} on processor")
 
 
 def main():
@@ -146,7 +159,11 @@ def main():
     print()
     numeric = NumericProcessor()
     stream.register_processor(numeric)
-    test =  ['Hello world', [3.14, -1, 2.71], [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'}, {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]
+    test = ['Hello world', [3.14, -1, 2.71],
+            [{'log_level': 'WARNING', 'log_message':
+              'Telnet access! Use ssh instead'},
+            {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42,
+            ['Hi', 'five']]
     print(f"Send first batch of data on stream: {test}")
     stream.process_stream(test)
     stream.print_processors_stats()
@@ -161,7 +178,8 @@ def main():
 
     stream.print_processors_stats()
     print()
-    print("Consume some elements from the data processors: Numeric 3, Text 2, Log 1")
+    print("Consume some elements from the data processors: "
+          "Numeric 3, Text 2, Log 1")
     numeric.output()
     numeric.output()
     numeric.output()
@@ -171,6 +189,6 @@ def main():
 
     stream.print_processors_stats()
 
+
 if __name__ == "__main__":
     main()
-    
