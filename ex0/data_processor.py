@@ -3,9 +3,9 @@ import abc
 
 
 class DataProcessor(abc.ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         self.counter = 0
-        self.values = []
+        self.values: list[tuple[int, str]] = []
 
     @abc.abstractmethod
     def validate(self, data: typing.Any) -> bool:
@@ -110,7 +110,7 @@ class LogProcessor(DataProcessor):
             self.counter += 1
 
 
-def main():
+def main() -> None:
     print("=== Code Nexus - Data Processor ===")
     print()
     print("Testing Numeric Processor...")
@@ -133,8 +133,8 @@ def main():
     print("Extracting 3 values...")
     i = 0
     while i < 3:
-        result = num_proc.output()[1]
-        print(f"Numeric value {i}: {result}")
+        result_output = num_proc.output()[1]
+        print(f"Numeric value {i}: {result_output}")
         i += 1
     print()
     print("Testing Text Processor...")
@@ -145,8 +145,8 @@ def main():
     text_proc.ingest(string_list)
     print(f"Processing data: {string_list}")
     print("Extracting 1 value...")
-    result = text_proc.output()[1]
-    print(f"Text value 0: {result}")
+    result_output = text_proc.output()[1]
+    print(f"Text value 0: {result_output}")
     print()
     print("Testing Log Processor...")
     log_proc = LogProcessor()
@@ -158,8 +158,8 @@ def main():
     print(f"Processing data: {log_test}")
     j = 0
     while j < 2:
-        result = log_proc.output()[1]
-        print(f"Log entry {j}: {result}")
+        result_output = log_proc.output()[1]
+        print(f"Log entry {j}: {result_output}")
         j += 1
 
 

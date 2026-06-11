@@ -3,9 +3,9 @@ import abc
 
 
 class DataProcessor(abc.ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         self.counter = 0
-        self.values = []
+        self.values: list[tuple[int, str]] = []
 
     @abc.abstractmethod
     def validate(self, data: typing.Any) -> bool:
@@ -111,8 +111,8 @@ class LogProcessor(DataProcessor):
 
 
 class DataStream():
-    def __init__(self):
-        self.processor = []
+    def __init__(self) -> None:
+        self.processor: list[DataProcessor] = []
 
     def register_processor(self, proc: DataProcessor) -> None:
         self.processor.append(proc)
@@ -148,7 +148,7 @@ class DataStream():
                   f"{remainder} on processor")
 
 
-def main():
+def main() -> None:
     print("=== Code Nexus - Data Stream ===")
     print()
     print("Initialize Data Stream...")

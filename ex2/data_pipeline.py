@@ -3,9 +3,9 @@ import abc
 
 
 class DataProcessor(abc.ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         self.counter = 0
-        self.values = []
+        self.values: list[tuple[int, str]] = []
 
     @abc.abstractmethod
     def validate(self, data: typing.Any) -> bool:
@@ -21,7 +21,7 @@ class DataProcessor(abc.ABC):
 
 class NumericProcessor(DataProcessor):
     def validate(self, data: typing.Any) -> bool:
-        if type(data) is (int, float):
+        if type(data) in (int, float):
             return True
         if type(data) is list:
             for element in data:
@@ -150,8 +150,8 @@ class JSON:
 
 
 class DataStream():
-    def __init__(self):
-        self.processor = []
+    def __init__(self) -> None:
+        self.processor: list[DataProcessor] = []
 
     def register_processor(self, proc: DataProcessor) -> None:
         self.processor.append(proc)
@@ -201,7 +201,7 @@ class DataStream():
                 plugin.process_output(data_output)
 
 
-def main():
+def main() -> None:
     print("=== Code Nexus - Data Pipeline ===")
     print()
     print("Initialize Data Stream...")
