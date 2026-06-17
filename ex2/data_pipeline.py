@@ -20,7 +20,7 @@ class DataProcessor(abc.ABC):
 
 
 class NumericProcessor(DataProcessor):
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: int | float | list[int | float]) -> bool:
         if type(data) in (int, float):
             return True
         if type(data) is list:
@@ -33,7 +33,7 @@ class NumericProcessor(DataProcessor):
         else:
             return False
 
-    def ingest(self, data: typing.Any) -> None:
+    def ingest(self, data: int | float | list[int | float]) -> None:
         if not self.validate(data):
             raise ValueError("Improper numeric data")
         if type(data) is list:
@@ -46,12 +46,12 @@ class NumericProcessor(DataProcessor):
 
 
 class TextProcessor(DataProcessor):
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: str | list[str]) -> bool:
         if type(data) is (str):
             return True
         if type(data) is list:
             for element in data:
-                if type(element) is (str):
+                if element and type(element) is (str):
                     pass
                 else:
                     return False
@@ -60,7 +60,7 @@ class TextProcessor(DataProcessor):
         else:
             return False
 
-    def ingest(self, data: typing.Any) -> None:
+    def ingest(self, data: str | list[str]) -> None:
         if not self.validate(data):
             raise ValueError("Improper text data")
         if type(data) is list:
@@ -68,12 +68,12 @@ class TextProcessor(DataProcessor):
                 self.values.append((self.counter, element))
                 self.counter += 1
         else:
-            self.values.append((self.counter, data))
+            self.values.append((self.counter, str(data)))
             self.counter += 1
 
 
 class LogProcessor(DataProcessor):
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: dict[str, str] | list[dict[str, str]]) -> bool:
         if type(data) is dict:
             for key, value in data.items():
                 if (
@@ -104,15 +104,16 @@ class LogProcessor(DataProcessor):
         else:
             return False
 
-    def ingest(self, data: typing.Any) -> None:
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise ValueError("Improper log data")
-        if type(data) is list:
+        if isinstance(data, list):
             for element in data:
-                log = f"{element['log_level']}: {element['log_message']}"
-                self.values.append((self.counter, log))
-                self.counter += 1
-        else:
+                if isinstance(element, dict):
+                    log = f"{element['log_level']}: {element['log_message']}"
+                    self.values.append((self.counter, log))
+                    self.counter += 1
+        elif isinstance(data, dict):
             log = f"{data['log_level']}: {data['log_message']}"
             self.values.append((self.counter, log))
             self.counter += 1
@@ -222,35 +223,38 @@ def main() -> None:
     example.register_processor(NumericProcessor())
     example.register_processor(TextProcessor())
     example.register_processor(LogProcessor())
-    text1 = ['Hello world', [3.14, -1, 2.71],
-             [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh '
-              'instead'}, {'log_level': 'INFO', 'log_message': 'User wil is '
-              'connected'}], 42, ['Hi', 'five']]
-    print(f"Send first batch of data on stream: {text1}")
-    print()
-    example.process_stream(text1)
-    example.print_processors_stats()
-    print()
-    print("Send 3 processed data from each processor to a CSV plugin:")
-    csv = CSV()
-    example.output_pipeline(3, csv)
-    print()
-    example.print_processors_stats()
-    print()
-    text2 = [21, ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
-             [{'log_level': 'ERROR', 'log_message': '500 server crash'},
-             {'log_level': 'NOTICE', 'log_message': 'Certificate expires in'
-              '10 days'}], [32, 42, 64, 84, 128, 168], 'World hello']
-    print(f"Send another batch of data: {text2}")
-    print()
-    example.process_stream(text2)
-    example.print_processors_stats()
-    print()
-    print("Send 5 processed data from each processor to a JSON plugin:")
-    json = JSON()
-    example.output_pipeline(5, json)
-    print()
-    example.print_processors_stats()
+    try:
+        text1 = ['Hello world', [3.14, -1, 2.71],
+                 [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use'
+                  ' ssh instead'}, {'log_level': 'INFO', 'log_message': 'User'
+                  ' will is connected'}], 42, ['Hi', 'five']]
+        print(f"Send first batch of data on stream: {text1}")
+        print()
+        example.process_stream(text1)
+        example.print_processors_stats()
+        print()
+        print("Send 3 processed data from each processor to a CSV plugin:")
+        csv = CSV()
+        example.output_pipeline(3, csv)
+        print()
+        example.print_processors_stats()
+        print()
+        text2 = [21, ['I love AI', 'LLMs are wonderful', 'Stay healthy'],
+                 [{'log_level': 'ERROR', 'log_message': '500 server crash'},
+                 {'log_level': 'NOTICE', 'log_message': 'Certificate expires'
+                  ' in 10 days'}], [32, 42, 64, 84, 128, 168], 'World hello']
+        print(f"Send another batch of data: {text2}")
+        print()
+        example.process_stream(text2)
+        example.print_processors_stats()
+        print()
+        print("Send 5 processed data from each processor to a JSON plugin:")
+        json = JSON()
+        example.output_pipeline(5, json)
+        print()
+        example.print_processors_stats()
+    except (ValueError, IndexError, KeyError) as e:
+        print(f"Got exception: {e}")
 
 
 if __name__ == "__main__":

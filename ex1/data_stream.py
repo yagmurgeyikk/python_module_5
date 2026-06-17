@@ -20,7 +20,7 @@ class DataProcessor(abc.ABC):
 
 
 class NumericProcessor(DataProcessor):
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: int | float | list[int | float]) -> bool:
         if type(data) in (int, float):
             return True
         if type(data) is list:
@@ -33,7 +33,7 @@ class NumericProcessor(DataProcessor):
         else:
             return False
 
-    def ingest(self, data: typing.Any) -> None:
+    def ingest(self, data: int | float | list[int | float]) -> None:
         if not self.validate(data):
             raise ValueError("Improper numeric data")
         if type(data) is list:
@@ -46,7 +46,7 @@ class NumericProcessor(DataProcessor):
 
 
 class TextProcessor(DataProcessor):
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: str | list[str]) -> bool:
         if type(data) is (str):
             return True
         if type(data) is list:
@@ -60,7 +60,7 @@ class TextProcessor(DataProcessor):
         else:
             return False
 
-    def ingest(self, data: typing.Any) -> None:
+    def ingest(self, data: str | list[str]) -> None:
         if not self.validate(data):
             raise ValueError("Improper text data")
         if type(data) is list:
@@ -68,12 +68,12 @@ class TextProcessor(DataProcessor):
                 self.values.append((self.counter, element))
                 self.counter += 1
         else:
-            self.values.append((self.counter, data))
+            self.values.append((self.counter, str(data)))
             self.counter += 1
 
 
 class LogProcessor(DataProcessor):
-    def validate(self, data: typing.Any) -> bool:
+    def validate(self, data: dict[str, str] | list[dict[str, str]]) -> bool:
         if type(data) is dict:
             for key, value in data.items():
                 if (
@@ -105,15 +105,16 @@ class LogProcessor(DataProcessor):
         else:
             return False
 
-    def ingest(self, data: typing.Any) -> None:
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise ValueError("Improper log data")
-        if type(data) is list:
+        if isinstance(data, list):
             for element in data:
-                log = f"{element['log_level']}: {element['log_message']}"
-                self.values.append((self.counter, log))
-                self.counter += 1
-        else:
+                if isinstance(element, dict):
+                    log = f"{element['log_level']}: {element['log_message']}"
+                    self.values.append((self.counter, log))
+                    self.counter += 1
+        elif isinstance(data, dict):
             log = f"{data['log_level']}: {data['log_message']}"
             self.values.append((self.counter, log))
             self.counter += 1
@@ -180,25 +181,23 @@ def main() -> None:
     print("Registering other data processors")
     txt = TextProcessor()
     log = LogProcessor()
-    stream.register_processor(txt)
-    stream.register_processor(log)
-    print("Send the same batch again")
-    stream.process_stream(test)
-    stream.print_processors_stats()
-    print()
-    print("Consume some elements from the data processors: "
-          "Numeric 3, Text 2, Log 1")
     try:
+        stream.register_processor(txt)
+        stream.register_processor(log)
+        print("Send the same batch again")
+        stream.process_stream(test)
+        stream.print_processors_stats()
+        print()
+        print("Consume some elements from the data processors: "
+              "Numeric 3, Text 2, Log 1")
         numeric.output()
         numeric.output()
         numeric.output()
         txt.output()
         txt.output()
         log.output()
-    except Exception:
-        print()
-        print("False - Test directory is incorrect")
-        print()
+    except (ValueError, IndexError, KeyError) as e:
+        print(f"Got exception: {e}")
     stream.print_processors_stats()
 
 
