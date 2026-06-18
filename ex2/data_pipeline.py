@@ -201,7 +201,7 @@ class DataStream():
             data_output = []
             i = 0
             length = len(element.values)
-            while i < nb and length > 0:
+            while i < nb:
                 processor_value = element.output()
                 data_output.append(processor_value)
                 i += 1
