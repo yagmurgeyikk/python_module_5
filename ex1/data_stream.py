@@ -20,7 +20,7 @@ class DataProcessor(abc.ABC):
 
 
 class NumericProcessor(DataProcessor):
-    def validate(self, data: int | float | list[int | float]) -> bool:
+    def validate(self, data: typing.Any) -> bool:
         if type(data) in (int, float):
             return True
         if type(data) is list:
@@ -46,7 +46,7 @@ class NumericProcessor(DataProcessor):
 
 
 class TextProcessor(DataProcessor):
-    def validate(self, data: str | list[str]) -> bool:
+    def validate(self, data: typing.Any) -> bool:
         if type(data) is (str):
             return True
         if type(data) is list:
@@ -73,7 +73,7 @@ class TextProcessor(DataProcessor):
 
 
 class LogProcessor(DataProcessor):
-    def validate(self, data: dict[str, str] | list[dict[str, str]]) -> bool:
+    def validate(self, data: typing.Any) -> bool:
         if type(data) is dict:
             for key, value in data.items():
                 if (
